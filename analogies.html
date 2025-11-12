@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<script>
+  // Set a default user for testing if not logged in
+  if (!sessionStorage.getItem("loggedInUser")) {
+    sessionStorage.setItem("loggedInUser", "admin");
+    console.log("Set default user to 'admin' for testing");
+  }
+</script>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analogy Library</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">ContextBridge</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="playground.html">Playground</a>
+      <a href="analogies.html" class="active">Analogies</a>
+      <a href="#" onclick="signOut()">Sign Out</a>
+    </nav>
+  </header>
+
+  <main class="library-container">
+    <div class="page-header">
+      <h1><span class="icon-book"></span> Idiom Database</h1>
+      <p class="subtitle">Search the complete database of idioms from around the world</p>
+    </div>
+
+    <!-- Add Idiom Button -->
+    <button class="add-btn enhanced" onclick="openAddModal()">
+      <span class="btn-icon icon-plus">➕</span>
+      Add New Idiom
+    </button>
+
+    <!-- Enhanced Search Box -->
+    <div class="search-box enhanced">
+      <div class="search-icon icon-search">🔍</div>
+      <input type="text" id="searchInput" placeholder="Search idioms by title..." onkeypress="handleSearchKeyPress(event)">
+      <button class="search-btn" onclick="performSearch()">Search</button>
+    </div>
+
+    <!-- Search Results -->
+    <div id="searchResults" class="search-results" style="display:none;">
+      <h3>Search Results</h3>
+      <div id="searchResultsList"></div>
+    </div>
+
+    <!-- Hidden Analogy List (not displayed by default) -->
+    <div id="analogyList" class="analogy-list" style="display:none;"></div>
+  </main>
+
+  <!-- Modal for Adding / Editing -->
+  <div id="analogyModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Add New Analogy</h2>
+
+      <!-- Language Selection for New Analogy -->
+      <label for="analogyLanguage">Language:</label>
+      <select id="analogyLanguage">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+        <option value="te">Telugu</option>
+        <option value="zh">Chinese</option>
+        <option value="de">German</option>
+      </select>
+
+      <input type="text" id="analogyTitle" placeholder="Analogy Title">
+      <textarea id="analogyDescription" placeholder="Analogy Description"></textarea>
+
+      <button onclick="saveAnalogy()">Save</button>
+      <button onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script src="analogies.js?v=3"></script>
+  <script>
+    function signOut() {
+      sessionStorage.removeItem("loggedInUser");
+      sessionStorage.removeItem("userEmail");
+      window.location.href = "signin.html";
+    }
+  </script>
+</body>
+</html>

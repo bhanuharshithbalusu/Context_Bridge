@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to ContextBridge</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f8f9fa;
+    }
+    .auth-page {
+      display: flex;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 1000px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .info-section {
+      flex: 1;
+      padding: 2rem;
+      background: linear-gradient(135deg, #1aa483, #18c2a7);
+      color: white;
+    }
+    .info-section h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .info-section p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+    .feature-list li {
+      margin-bottom: 0.8rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    .feature-list li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: #fff;
+      font-weight: bold;
+    }
+    .form-section {
+      flex: 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .form-section h2 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .form-section input {
+      width: 100%;
+      padding: 12px;
+      margin: 0.5rem 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .form-section button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 12px;
+      background: #1aa483;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .form-section button:hover {
+      background: #18c2a7;
+    }
+    .form-section button.secondary {
+      background: #6c757d;
+    }
+    .form-section button.secondary:hover {
+      background: #5a6268;
+    }
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+    .success-message {
+      color: #27ae60;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    .auth-tab.active {
+      border-bottom: 3px solid #1aa483;
+      color: #1aa483;
+      font-weight: bold;
+    }
+    .auth-form {
+      display: none;
+    }
+    .auth-form.active {
+      display: block;
+    }
+    .gmail-info {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .divider {
+      text-align: center;
+      margin: 1rem 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <!-- Left Info Section -->
+    <div class="info-section">
+      <h1>Welcome to ContextBridge 🌍</h1>
+      <p>
+        We help you communicate across cultures with contextually adaptive,
+        multilingual expressions.
+      </p>
+      <ul class="feature-list">
+        <li>Culturally relevant analogies</li>
+        <li>Smart multilingual rephrasings</li>
+        <li>Personalized dashboard & tools</li>
+        <li>Seamless collaboration</li>
+      </ul>
+      <p style="margin-top:1rem;font-size:0.95rem;">
+        Sign up only if you're ready to transform the way you connect with the world!
+      </p>
+    </div>
+
+    <!-- Right Sign In/Up Section -->
+    <div class="form-section">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchTab('login')">Login</div>
+        <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm" class="auth-form active">
+        <h2>Login to ContextBridge</h2>
+        <input type="text" id="loginUsername" placeholder="Username" required>
+        <div class="error-message" id="loginUsernameError">Username not found</div>
+        
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <div class="error-message" id="loginPasswordError">Incorrect password</div>
+        
+        <button onclick="login()">Login</button>
+        
+        <div class="divider">or</div>
+        
+        <button class="secondary" onclick="switchTab('signup')">Create New Account</button>
+      </div>
+
+      <!-- Sign Up Form -->
+      <div id="signupForm" class="auth-form">
+        <h2>Join ContextBridge</h2>
+        <input type="email" id="signupEmail" placeholder="Gmail Address" required>
+        <div class="error-message" id="signupEmailError">Please enter a valid Gmail address</div>
+        <div class="success-message" id="signupEmailSuccess">Gmail available</div>
+        
+        <input type="text" id="signupUsername" placeholder="Username" required>
+        <div class="error-message" id="signupUsernameError">Username already exists</div>
+        <div class="success-message" id="signupUsernameSuccess">Username available</div>
+        
+        <input type="password" id="signupPassword" placeholder="Password" required>
+        <div class="error-message" id="signupPasswordError">Password must be at least 6 characters</div>
+        
+        <button onclick="signUp()">Create Account</button>
+        
+        <div class="divider">or</div>
+        
+        <button class="secondary" onclick="switchTab('login')">Already have an account? Login</button>
+        
+        <div class="gmail-info">
+          <p>We use Gmail for authentication to ensure unique accounts</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize users storage if not exists
+    function initializeUsers() {
+      if (!localStorage.getItem('users')) {
+        localStorage.setItem('users', JSON.stringify({}));
+      }
+    }
+
+    // Validate email format
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email) && email.toLowerCase().endsWith('@gmail.com');
+    }
+
+    // Check if username is unique
+    function isUsernameUnique(username) {
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      return !Object.values(users).some(user => user.username.toLowerCase() === username.toLowerCase());
+    }
+
+    // Check if email is already registered
+    function isEmailRegistered(email) {
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      return users.hasOwnProperty(email.toLowerCase());
+    }
+
+    // Get user by username
+    function getUserByUsername(username) {
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      return Object.values(users).find(user => user.username.toLowerCase() === username.toLowerCase());
+    }
+
+    // Get user by email
+    function getUserByEmail(email) {
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      return users[email.toLowerCase()];
+    }
+
+    // Switch between login and signup tabs
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+      
+      if (tab === 'login') {
+        document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+        clearLoginErrors();
+      } else {
+        document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+        document.getElementById('signupForm').classList.add('active');
+        clearSignupErrors();
+      }
+    }
+
+    // Clear error messages in login form
+    function clearLoginErrors() {
+      document.getElementById('loginUsernameError').style.display = 'none';
+      document.getElementById('loginPasswordError').style.display = 'none';
+    }
+
+    // Clear error messages in signup form
+    function clearSignupErrors() {
+      document.getElementById('signupEmailError').style.display = 'none';
+      document.getElementById('signupEmailSuccess').style.display = 'none';
+      document.getElementById('signupUsernameError').style.display = 'none';
+      document.getElementById('signupUsernameSuccess').style.display = 'none';
+      document.getElementById('signupPasswordError').style.display = 'none';
+    }
+
+    // Validate login form
+    function validateLogin() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      
+      let isValid = true;
+      clearLoginErrors();
+
+      if (!username) {
+        document.getElementById('loginUsernameError').textContent = 'Username is required';
+        document.getElementById('loginUsernameError').style.display = 'block';
+        isValid = false;
+      }
+
+      if (!password) {
+        document.getElementById('loginPasswordError').textContent = 'Password is required';
+        document.getElementById('loginPasswordError').style.display = 'block';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // Validate signup form
+    function validateSignup() {
+      const email = document.getElementById('signupEmail').value.trim();
+      const username = document.getElementById('signupUsername').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      
+      let isValid = true;
+      clearSignupErrors();
+
+      // Validate email
+      if (!isValidEmail(email)) {
+        document.getElementById('signupEmailError').textContent = 'Please enter a valid Gmail address';
+        document.getElementById('signupEmailError').style.display = 'block';
+        isValid = false;
+      } else if (isEmailRegistered(email)) {
+        document.getElementById('signupEmailError').textContent = 'This Gmail is already registered';
+        document.getElementById('signupEmailError').style.display = 'block';
+        isValid = false;
+      }
+
+      // Validate username
+      if (username.length < 3) {
+        document.getElementById('signupUsernameError').textContent = 'Username must be at least 3 characters';
+        document.getElementById('signupUsernameError').style.display = 'block';
+        isValid = false;
+      } else if (!isUsernameUnique(username)) {
+        document.getElementById('signupUsernameError').textContent = 'Username already exists';
+        document.getElementById('signupUsernameError').style.display = 'block';
+        isValid = false;
+      }
+
+      // Validate password
+      if (password.length < 6) {
+        document.getElementById('signupPasswordError').textContent = 'Password must be at least 6 characters';
+        document.getElementById('signupPasswordError').style.display = 'block';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // Login function
+    function login() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!validateLogin()) {
+        return;
+      }
+
+      const user = getUserByUsername(username);
+      
+      if (!user) {
+        document.getElementById('loginUsernameError').textContent = 'Username not found';
+        document.getElementById('loginUsernameError').style.display = 'block';
+        return;
+      }
+
+      if (user.password !== password) {
+        document.getElementById('loginPasswordError').textContent = 'Incorrect password';
+        document.getElementById('loginPasswordError').style.display = 'block';
+        return;
+      }
+
+      // Successful login
+      sessionStorage.setItem('loggedInUser', user.username);
+      sessionStorage.setItem('userEmail', user.email);
+      window.location.href = 'index.html';
+    }
+
+    // Sign up function
+    function signUp() {
+      const email = document.getElementById('signupEmail').value.trim();
+      const username = document.getElementById('signupUsername').value.trim();
+      const password = document.getElementById('signupPassword').value;
+
+      if (!validateSignup()) {
+        return;
+      }
+
+      // Register new user
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      users[email.toLowerCase()] = {
+        email: email.toLowerCase(),
+        username: username,
+        password: password,
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      // Initialize user data
+      localStorage.setItem(`analogies_${username}`, JSON.stringify([]));
+      
+      alert('Account created successfully! You can now login.');
+      clearSignupForm();
+      switchTab('login');
+    }
+
+    // Clear signup form
+    function clearSignupForm() {
+      document.getElementById('signupEmail').value = '';
+      document.getElementById('signupUsername').value = '';
+      document.getElementById('signupPassword').value = '';
+      clearSignupErrors();
+    }
+
+    // Real-time validation for signup form
+    document.getElementById('signupEmail').addEventListener('blur', function() {
+      const email = this.value.trim();
+      clearSignupErrors();
+      
+      if (!email) return;
+      
+      if (!isValidEmail(email)) {
+        document.getElementById('signupEmailError').textContent = 'Please enter a valid Gmail address';
+        document.getElementById('signupEmailError').style.display = 'block';
+      } else if (isEmailRegistered(email)) {
+        document.getElementById('signupEmailError').textContent = 'This Gmail is already registered';
+        document.getElementById('signupEmailError').style.display = 'block';
+      } else {
+        document.getElementById('signupEmailSuccess').style.display = 'block';
+      }
+    });
+
+    document.getElementById('signupUsername').addEventListener('blur', function() {
+      const username = this.value.trim();
+      clearSignupErrors();
+      
+      if (!username) return;
+      
+      if (username.length < 3) {
+        document.getElementById('signupUsernameError').textContent = 'Username must be at least 3 characters';
+        document.getElementById('signupUsernameError').style.display = 'block';
+      } else if (!isUsernameUnique(username)) {
+        document.getElementById('signupUsernameError').textContent = 'Username already exists';
+        document.getElementById('signupUsernameError').style.display = 'block';
+      } else {
+        document.getElementById('signupUsernameSuccess').style.display = 'block';
+      }
+    });
+
+    document.getElementById('signupPassword').addEventListener('blur', function() {
+      const password = this.value;
+      clearSignupErrors();
+      
+      if (!password) return;
+      
+      if (password.length < 6) {
+        document.getElementById('signupPasswordError').textContent = 'Password must be at least 6 characters';
+        document.getElementById('signupPasswordError').style.display = 'block';
+      }
+    });
+
+    // Initialize on page load
+    initializeUsers();
+  </script>
+</body>
+</html>

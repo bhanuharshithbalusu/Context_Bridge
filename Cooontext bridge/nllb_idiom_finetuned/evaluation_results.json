@@ -1,0 +1,46 @@
+{
+  "overall": {
+    "avg_pred_length": 7.746666666666667,
+    "avg_ref_length": 8.536,
+    "length_ratio": 0.9075288972196189,
+    "exact_match_pct": 0.4
+  },
+  "by_language_pair": {
+    "eng_Latn -> tel_Telu": {
+      "avg_pred_length": 2.9278350515463916,
+      "avg_ref_length": 2.752577319587629,
+      "length_ratio": 1.0636704119850187,
+      "exact_match_pct": 1.0309278350515463
+    },
+    "tel_Telu -> eng_Latn": {
+      "avg_pred_length": 12.181286549707602,
+      "avg_ref_length": 12.526315789473685,
+      "length_ratio": 0.972455648926237,
+      "exact_match_pct": 0.0
+    },
+    "eng_Latn -> hin_Deva": {
+      "avg_pred_length": 3.0729166666666665,
+      "avg_ref_length": 3.9270833333333335,
+      "length_ratio": 0.7824933687002652,
+      "exact_match_pct": 1.0416666666666665
+    },
+    "hin_Deva -> tel_Telu": {
+      "avg_pred_length": 5.518867924528302,
+      "avg_ref_length": 4.981132075471698,
+      "length_ratio": 1.1079545454545456,
+      "exact_match_pct": 0.0
+    },
+    "tel_Telu -> hin_Deva": {
+      "avg_pred_length": 11.854748603351956,
+      "avg_ref_length": 13.340782122905027,
+      "length_ratio": 0.8886097152428811,
+      "exact_match_pct": 0.0
+    },
+    "hin_Deva -> eng_Latn": {
+      "avg_pred_length": 5.217821782178218,
+      "avg_ref_length": 6.930693069306931,
+      "length_ratio": 0.7528571428571429,
+      "exact_match_pct": 0.9900990099009901
+    }
+  }
+}

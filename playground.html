@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<script>
+  if (!sessionStorage.getItem("loggedInUser")) {
+    window.location.href = "signin.html";
+  }
+</script>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContextBridge - Playground</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">ContextBridge</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="playground.html" class="active">Playground</a>
+      <a href="analogies.html">Analogies</a>
+      <a href="#" onclick="signOut()">Sign Out</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1><span class="icon-globe"></span> Translation Playground</h1>
+      <p class="subtitle">Experience context-aware multilingual translation</p>
+    </div>
+
+    <div class="input-card enhanced">
+      <div class="input-header">
+        <span class="input-icon">&#9999;&#65039;</span>
+        <label for="input-text">Enter your text to translate</label>
+      </div>
+      <textarea id="input-text" placeholder="Type or paste your text here..."></textarea>
+
+      <div class="dropdowns">
+        <div class="dropdown-group">
+          <label for="from-language">From Language</label>
+          <select id="from-language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="te">తెలుగు</option>
+            <option value="zh">中文</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+
+        <div class="dropdown-group">
+          <label for="to-language">To Language</label>
+          <select id="to-language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="te">తెలుగు</option>
+            <option value="zh">中文</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="generate-btn" onclick="generateResult()">Generate Translation</button>
+    </div>
+
+    <!-- Output Box -->
+    <div class="output-section" id="result-box" style="display:none;">
+      <div class="output-box large">
+        <h3>Translation Result</h3>
+        <div class="translation-result">
+          <p id="output-text"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function signOut() {
+      sessionStorage.removeItem("loggedInUser");
+      sessionStorage.removeItem("userEmail");
+      window.location.href = "signin.html";
+    }
+
+    async function generateResult() {
+      let inputText = document.getElementById("input-text").value.trim();
+      let fromLang = document.getElementById("from-language").value;
+      let toLang = document.getElementById("to-language").value;
+      let useContextual = true; // Always use contextual translation
+
+      if(inputText === "") {
+        alert("Please enter some text to translate.");
+        return;
+      }
+
+      if(fromLang === toLang) {
+        alert("Please select different source and target languages.");
+        return;
+      }
+
+      // Show loading state
+      document.getElementById("output-text").innerHTML = "🔄 Translating...";
+      document.getElementById("result-box").style.display = "block";
+
+      console.log("Translation request:", {fromLang, toLang, useContextual, text: inputText});
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout for slow CPU
+
+        // Add progress indicator
+        let dots = 0;
+        const progressInterval = setInterval(() => {
+          dots = (dots + 1) % 4;
+          document.getElementById("output-text").innerHTML = 
+            `🔄 Translating${'.'.repeat(dots)}<br><small>This may take 1-2 minutes on CPU...</small>`;
+        }, 500);
+
+        const response = await fetch("http://127.0.0.1:5001/api/translate", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            text: inputText,
+            source_lang: fromLang,
+            target_lang: toLang,
+            use_contextual: useContextual
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+        clearInterval(progressInterval);
+
+        if (!response.ok) {
+          throw new Error(`Server responded with status ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        if (data.success && data.target_text) {
+          // Display only the translated text, nothing more
+          document.getElementById("output-text").innerHTML = data.target_text;
+        } else {
+          document.getElementById("output-text").innerHTML = 
+            `❌ Translation failed: ${data.error || "Unknown error"}`;
+        }
+      } catch (err) {
+        console.error("Translation error:", err);
+        
+        // Clear any progress interval
+        if (typeof progressInterval !== 'undefined') {
+          clearInterval(progressInterval);
+        }
+        
+        if (err.name === 'AbortError') {
+          document.getElementById("output-text").innerHTML = 
+            `⏱️ Translation timed out after 2 minutes. The model might be too slow on CPU.<br><small>Try shorter text or consider using a GPU.</small>`;
+        } else if (err.message.includes('Failed to fetch')) {
+          document.getElementById("output-text").innerHTML = 
+            `🔌 Connection failed. Please make sure the translation server is running.<br><small>Start the server by running: <code>cd "Cooontext bridge" && python3 playground_api.py</code></small>`;
+        } else {
+          document.getElementById("output-text").innerHTML = 
+            `❌ Error: ${err.message}`;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

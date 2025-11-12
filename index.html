@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<script>
+  if (!sessionStorage.getItem("loggedInUser")) {
+    window.location.href = "signin.html";
+  }
+</script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContextBridge</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="navbar">
+  <div class="logo">ContextBridge</div>
+  <nav>
+    <span id="welcomeUser"></span>
+    <a href="index.html" class="active">Home</a>
+    <a href="playground.html">Playground</a>
+    <a href="analogies.html">Analogies</a>
+    <a href="#" onclick="signOut()">Sign Out</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Contextually Adaptive Multilingual Communication</h1>
+      <p>Our AI system rephrases concepts using culturally relevant analogies and references.</p>
+      <button class="try-demo" onclick="location.href='playground.html'">Try Demo</button>
+    </div>
+    <div class="hero-graphic">
+      <img src="logo.jpeg" alt="ContextBridge Logo" class="hero-logo">
+    </div>
+  </section>
+
+  <section class="locales">
+    <h2>Supported Languages</h2>
+    <div class="locale-list">
+      <div class="locale-card"><span class="symbol">A</span><p>English</p></div>
+      <div class="locale-card"><span class="symbol">ह</span><p>हिन्दी</p></div>
+      <div class="locale-card"><span class="symbol">తె</span><p>తెలుగు</p></div>
+      <div class="locale-card"><span class="symbol">汉</span><p>中国人</p></div>
+      <div class="locale-card"><span class="symbol">G</span><p>deutsch</p></div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature-card">
+      <h3>Cultural Adaptation</h3>
+      <p>Automatically adapts content to cultural contexts and regional preferences for better communication.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Smart Analogies</h3>
+      <p>Uses culturally relevant analogies and references to make complex concepts more understandable.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const user = sessionStorage.getItem("loggedInUser");
+    document.getElementById("welcomeUser").textContent = "Hi, " + user;
+  });
+
+  function signOut() {
+    sessionStorage.removeItem("loggedInUser");
+    sessionStorage.removeItem("userEmail");
+    window.location.href = "signin.html";
+  }
+</script>
+</body>
+</html>

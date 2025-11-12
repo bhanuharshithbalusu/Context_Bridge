@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Debug Test</title>
+</head>
+<body>
+    <h1>Idiom Search Debug Test</h1>
+    
+    <input type="text" id="searchInput" placeholder="Enter search term..." value="piece of cake">
+    <button onclick="testSearch()">Test Search</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        const API_BASE_URL = "http://127.0.0.1:5002/api";
+        const currentUser = "admin";
+        
+        async function testSearch() {
+            const searchTerm = document.getElementById("searchInput").value.trim();
+            const resultsDiv = document.getElementById("results");
+            
+            console.log("Search term:", searchTerm);
+            console.log("Current user:", currentUser);
+            
+            const url = `${API_BASE_URL}/idioms/search?q=${encodeURIComponent(searchTerm)}&username=${currentUser}`;
+            console.log("API URL:", url);
+            
+            resultsDiv.innerHTML = "Searching...";
+            
+            try {
+                const response = await fetch(url);
+                console.log("Response status:", response.status);
+                
+                const data = await response.json();
+                console.log("Response data:", data);
+                
+                if (data.success) {
+                    resultsDiv.innerHTML = `
+                        <h3>Success! Found ${data.total_found} results:</h3>
+                        <pre>${JSON.stringify(data.results, null, 2)}</pre>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                resultsDiv.innerHTML = `<p style="color: red;">Network error: ${error.message}</p>`;
+            }
+        }
+        
+        // Test on page load
+        window.addEventListener('load', () => {
+            console.log("Page loaded, testing search...");
+            testSearch();
+        });
+    </script>
+</body>
+</html>

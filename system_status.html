@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContextBridge System Status</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .status-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .status-item {
+            background: white;
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status-item h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .status-online {
+            background-color: #4CAF50;
+        }
+        .status-offline {
+            background-color: #f44336;
+        }
+        .status-loading {
+            background-color: #ff9800;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .log-output {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">ContextBridge</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="playground.html">Playground</a>
+            <a href="analogies.html">Analogies</a>
+            <a href="system_status.html" class="active">System Status</a>
+        </nav>
+    </header>
+
+    <main class="status-container">
+        <h1>🔧 System Status Dashboard</h1>
+        <p>Check the health of all ContextBridge services</p>
+
+        <div class="status-item">
+            <h3><span id="playground-indicator" class="status-indicator status-loading"></span>Playground API Server (Port 5001)</h3>
+            <p id="playground-status">Checking...</p>
+            <button class="test-button" onclick="testPlaygroundAPI()">Test Translation API</button>
+            <div id="playground-log" class="log-output" style="display:none;"></div>
+        </div>
+
+        <div class="status-item">
+            <h3><span id="idiom-indicator" class="status-indicator status-loading"></span>Idiom Database API (Port 5002)</h3>
+            <p id="idiom-status">Checking...</p>
+            <button class="test-button" onclick="testIdiomAPI()">Test Database Connection</button>
+            <button class="test-button" onclick="testAddIdiom()">Test Add Idiom</button>
+            <div id="idiom-log" class="log-output" style="display:none;"></div>
+        </div>
+
+        <div class="status-item">
+            <h3><span id="database-indicator" class="status-indicator status-loading"></span>PostgreSQL Database</h3>
+            <p id="database-status">Checking through API...</p>
+            <button class="test-button" onclick="checkDatabaseStats()">View Database Stats</button>
+            <div id="database-log" class="log-output" style="display:none;"></div>
+        </div>
+
+        <div class="status-item">
+            <h3>🔄 Quick Actions</h3>
+            <button class="test-button" onclick="runFullSystemTest()">Run Full System Test</button>
+            <button class="test-button" onclick="clearAllLogs()">Clear Logs</button>
+        </div>
+    </main>
+
+    <script>
+        // API endpoints
+        const PLAYGROUND_API = "http://127.0.0.1:5001/api/translate";
+        const IDIOM_API = "http://127.0.0.1:5002/api";
+
+        // Status checking functions
+        async function updateStatus(indicator, statusText, message, isOnline) {
+            const indicatorEl = document.getElementById(indicator);
+            const statusEl = document.getElementById(statusText);
+            
+            indicatorEl.className = `status-indicator ${isOnline ? 'status-online' : 'status-offline'}`;
+            statusEl.textContent = message;
+        }
+
+        async function testPlaygroundAPI() {
+            const logEl = document.getElementById('playground-log');
+            logEl.style.display = 'block';
+            logEl.innerHTML = 'Testing playground API...\n';
+
+            try {
+                const response = await fetch(PLAYGROUND_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: "Hello",
+                        source_lang: "eng_Latn",
+                        target_lang: "tel_Telu"
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('playground-indicator', 'playground-status', 'Online - Translation working', true);
+                    logEl.innerHTML += `✅ SUCCESS: Translation test completed\nResponse: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('playground-indicator', 'playground-status', `Offline - ${error.message}`, false);
+                logEl.innerHTML += `❌ ERROR: ${error.message}`;
+            }
+        }
+
+        async function testIdiomAPI() {
+            const logEl = document.getElementById('idiom-log');
+            logEl.style.display = 'block';
+            logEl.innerHTML = 'Testing idiom API...\n';
+
+            try {
+                const response = await fetch(`${IDIOM_API}/idioms/list?language=en&username=test`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('idiom-indicator', 'idiom-status', 'Online - Database accessible', true);
+                    logEl.innerHTML += `✅ SUCCESS: Database connection working\nFound ${data.idioms?.length || 0} idioms\nResponse: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('idiom-indicator', 'idiom-status', `Offline - ${error.message}`, false);
+                logEl.innerHTML += `❌ ERROR: ${error.message}`;
+            }
+        }
+
+        async function testAddIdiom() {
+            const logEl = document.getElementById('idiom-log');
+            logEl.style.display = 'block';
+            logEl.innerHTML += '\nTesting add idiom...\n';
+
+            try {
+                const testIdiom = {
+                    language: "en",
+                    idiom: "Test idiom " + Date.now(),
+                    meaning: "A test idiom for system verification",
+                    username: "system_test"
+                };
+
+                const response = await fetch(`${IDIOM_API}/idioms/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testIdiom)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    logEl.innerHTML += `✅ SUCCESS: Idiom added successfully\nNew ID: ${data.id}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${errorData.error}`);
+                }
+            } catch (error) {
+                logEl.innerHTML += `❌ ERROR: ${error.message}`;
+            }
+        }
+
+        async function checkDatabaseStats() {
+            const logEl = document.getElementById('database-log');
+            logEl.style.display = 'block';
+            logEl.innerHTML = 'Checking database statistics...\n';
+
+            try {
+                // Test through idiom API to get stats
+                const response = await fetch(`${IDIOM_API}/idioms/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        language: "en",
+                        idiom: "temp_test_" + Date.now(),
+                        meaning: "temp test",
+                        username: "temp_user"
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('database-indicator', 'database-status', 'Connected - PostgreSQL working', true);
+                    
+                    if (data.statistics) {
+                        logEl.innerHTML += `✅ Database Statistics:\n`;
+                        data.statistics.forEach(stat => {
+                            logEl.innerHTML += `${stat.language}: ${stat.total_count} idioms (last updated: ${stat.last_updated})\n`;
+                        });
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('database-indicator', 'database-status', `Error - ${error.message}`, false);
+                logEl.innerHTML += `❌ ERROR: ${error.message}`;
+            }
+        }
+
+        async function runFullSystemTest() {
+            console.log("Running full system test...");
+            await testPlaygroundAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testIdiomAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await checkDatabaseStats();
+        }
+
+        function clearAllLogs() {
+            const logs = ['playground-log', 'idiom-log', 'database-log'];
+            logs.forEach(id => {
+                const el = document.getElementById(id);
+                el.style.display = 'none';
+                el.innerHTML = '';
+            });
+        }
+
+        // Initial status check on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runFullSystemTest, 500);
+        });
+    </script>
+</body>
+</html>
